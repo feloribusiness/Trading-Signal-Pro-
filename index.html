@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Signal Pro - Live Trading Signals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Trading Signal Pro</h1>
+                        <div class="text-xs text-gray-500">AI-Powered Technical Analysis</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-gray-600">Live</span>
+                    </div>
+                    <span class="text-sm text-gray-500" id="currentTime"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="mb-6">
+                <i class="fas fa-chart-candlestick text-6xl mb-4 animate-pulse-slow"></i>
+            </div>
+            <h2 class="text-4xl font-bold mb-4">Live Trading Signals</h2>
+            <p class="text-xl mb-8">AI-Powered Technical Analysis for Forex, Crypto & Commodities</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <i class="fas fa-signal text-2xl mb-2"></i>
+                    <div class="text-2xl font-bold" id="signalCount">12</div>
+                    <div class="text-sm">Active Signals</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <i class="fas fa-percentage text-2xl mb-2"></i>
+                    <div class="text-2xl font-bold">87%</div>
+                    <div class="text-sm">Success Rate</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <i class="fas fa-clock text-2xl mb-2"></i>
+                    <div class="text-2xl font-bold">24/7</div>
+                    <div class="text-sm">Live Updates</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <i class="fas fa-globe text-2xl mb-2"></i>
+                    <div class="text-2xl font-bold">50+</div>
+                    <div class="text-sm">Trading Pairs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner -->
+    <div class="bg-gradient-to-r from-orange-500 to-red-600 text-white py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h3 class="text-lg font-semibold">🔥 SPECIAL OFFER: Premium Signals with 95% Accuracy!</h3>
+            <p class="text-sm mt-1">Limited time - Upgrade now for just $99/month</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Filter Controls -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex flex-wrap gap-2">
+                    <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="timeframeFilter">
+                        <option value="all">All Timeframes</option>
+                        <option value="M1">M1 (1 hour validity)</option>
+                        <option value="M5">M5 (2 hours validity)</option>
+                        <option value="M15">M15 (4 hours validity)</option>
+                        <option value="M30">M30 (6 hours validity)</option>
+                        <option value="H1">H1 (12 hours validity)</option>
+                        <option value="H4">H4 (24 hours validity)</option>
+                        <option value="D1">D1 (3 days validity)</option>
+                    </select>
+                    <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="pairFilter">
+                        <option value="all">All Pairs</option>
+                        <option value="forex">Forex</option>
+                        <option value="crypto">Crypto</option>
+                        <option value="commodity">Commodities</option>
+                    </select>
+                </div>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors" onclick="refreshSignals()">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Signals Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="signalsContainer">
+            <!-- Signal cards will be generated here -->
+        </div>
+
+        <!-- Risk Calculator Section -->
+        <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-xl font-bold mb-6 flex items-center">
+                <i class="fas fa-calculator mr-3 text-blue-600"></i>
+                Risk & Reward Calculator
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Entry Price</label>
+                    <input type="number" id="entryPrice" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1.0850">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Stop Loss</label>
+                    <input type="number" id="stopLoss" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1.0800">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Take Profit</label>
+                    <input type="number" id="takeProfit" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1.0950">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Account Size</label>
+                    <input type="number" id="accountSize" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="10000">
+                </div>
+            </div>
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg" id="riskResult" style="display: none;">
+                <h4 class="font-semibold mb-2">Calculation Results:</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <span class="text-sm text-gray-600">Risk Amount:</span>
+                        <div class="font-medium" id="riskAmount">$0</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">Reward Amount:</span>
+                        <div class="font-medium" id="rewardAmount">$0</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">Risk/Reward:</span>
+                        <div class="font-medium" id="riskReward">1:0</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">Position Size:</span>
+                        <div class="font-medium" id="positionSize">0 lots</div>
+                    </div>
+                </div>
+            </div>
+            <button class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors" onclick="calculateRiskReward()">
+                <i class="fas fa-chart-pie mr-2"></i>Calculate Risk/Reward
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="mb-6">
+                <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-chart-line text-white"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Trading Signal Pro</h3>
+                <p class="text-gray-400">Professional Trading Signals with AI Analysis</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h4 class="font-semibold mb-3">Features</h4>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>Real-time Signals</li>
+                        <li>AI Technical Analysis</li>
+                        <li>Risk Management</li>
+                        <li>24/7 Support</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Markets</h4>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>Forex Major Pairs</li>
+                        <li>Cryptocurrencies</li>
+                        <li>Commodities</li>
+                        <li>Indices</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Support</h4>
+                    <ul class="text-gray-400 space-y-2">
+                        <li>Documentation</li>
+                        <li>Tutorial Videos</li>
+                        <li>Community</li>
+                        <li>Contact Us</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <p class="text-gray-400">© 2024 Trading Signal Pro. All rights reserved.</p>
+                <p class="text-gray-400 text-sm mt-2">⚠️ Trading involves substantial risk of loss. Please trade responsibly.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Disclaimer Modal -->
+    <div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-4">⚠️ Trading Risk Disclaimer</h2>
+            <div class="text-gray-700 space-y-4 mb-6">
+                <p>Trading foreign exchange, cryptocurrencies, and commodities on margin carries a high level of risk and may not be suitable for all investors.</p>
+                
+                <h3 class="font-semibold">Risks Include:</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Loss of your entire investment</li>
+                    <li>Market volatility and rapid price movements</li>
+                    <li>Leverage can work against you</li>
+                    <li>Technical failures and system issues</li>
+                </ul>
+                
+                <h3 class="font-semibold">Important Notes:</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Never trade with money you cannot afford to lose</li>
+                    <li>Our signals are for informational purposes only</li>
+                    <li>Past performance does not guarantee future results</li>
+                    <li>You are solely responsible for your trading decisions</li>
+                </ul>
+                
+                <p class="text-sm text-gray-600">By using our service, you acknowledge that you understand these risks and agree to trade at your own risk.</p>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <button onclick="acceptDisclaimer()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                    I Understand and Accept
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate comprehensive signals
+        const signals = [
+            { pair: 'EUR/USD', direction: 'BUY', entry: 1.0850, sl: 1.0800, tp: 1.0950, probability: 78, timeframe: 'H1', category: 'forex', expires: '12 hours' },
+            { pair: 'GBP/USD', direction: 'SELL', entry: 1.2750, sl: 1.2800, tp: 1.2650, probability: 82, timeframe: 'H4', category: 'forex', expires: '24 hours' },
+            { pair: 'XAUUSD', direction: 'BUY', entry: 2045.50, sl: 2030.00, tp: 2065.00, probability: 75, timeframe: 'D1', category: 'commodity', expires: '3 days' },
+            { pair: 'BTC/USD', direction: 'BUY', entry: 43550, sl: 42000, tp: 45500, probability: 71, timeframe: 'H4', category: 'crypto', expires: '24 hours' },
+            { pair: 'USD/JPY', direction: 'SELL', entry: 147.50, sl: 148.50, tp: 146.00, probability: 68, timeframe: 'H1', category: 'forex', expires: '12 hours' },
+            { pair: 'AUD/USD', direction: 'BUY', entry: 0.6550, sl: 0.6500, tp: 0.6650, probability: 73, timeframe: 'M15', category: 'forex', expires: '4 hours' },
+            { pair: 'USD/CHF', direction: 'SELL', entry: 0.8950, sl: 0.9000, tp: 0.8850, probability: 70, timeframe: 'M30', category: 'forex', expires: '6 hours' },
+            { pair: 'ETH/USD', direction: 'BUY', entry: 2280, sl: 2200, tp: 2380, probability: 74, timeframe: 'H1', category: 'crypto', expires: '12 hours' },
+            { pair: 'XAGUSD', direction: 'SELL', entry: 24.50, sl: 24.80, tp: 24.20, probability: 69, timeframe: 'H4', category: 'commodity', expires: '24 hours' },
+            { pair: 'EUR/GBP', direction: 'BUY', entry: 0.8550, sl: 0.8500, tp: 0.8650, probability: 72, timeframe: 'M5', category: 'forex', expires: '2 hours' },
+            { pair: 'NZD/USD', direction: 'SELL', entry: 0.6150, sl: 0.6200, tp: 0.6050, probability: 67, timeframe: 'M1', category: 'forex', expires: '1 hour' },
+            { pair: 'USD/CAD', direction: 'BUY', entry: 1.3650, sl: 1.3600, tp: 1.3750, probability: 76, timeframe: 'H4', category: 'forex', expires: '24 hours' }
+        ];
+
+        let currentSignals = [...signals];
+        let disclaimerAccepted = false;
+
+        function createSignalCard(signal) {
+            const isBuy = signal.direction === 'BUY';
+            const probColor = signal.probability >= 75 ? 'text-green-600' : signal.probability >= 60 ? 'text-yellow-600' : 'text-red-600';
+            
+            return `
+                <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900">${signal.pair}</h4>
+                            <p class="text-sm text-gray-500">${signal.timeframe} • Expires in ${signal.expires}</p>
+                        </div>
+                        <div class="px-3 py-1 rounded-full text-sm font-medium ${
+                            isBuy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }">
+                            ${signal.direction}
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Entry:</span>
+                            <span class="font-medium">${signal.entry}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">SL:</span>
+                            <span class="font-medium text-red-600">${signal.sl}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">TP:</span>
+                            <span class="font-medium text-green-600">${signal.tp}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm text-gray-600">Active</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium ${probColor}">${signal.probability}%</div>
+                            <div class="text-xs text-gray-500">Probability</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Risk: 2%</span>
+                            <span>Reward: ${Math.round((signal.tp - signal.entry) / (signal.entry - signal.sl) * 2)}%</span>
+                            <span>Ratio: 1:${Math.round((signal.tp - signal.entry) / (signal.entry - signal.sl))}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadSignals() {
+            const container = document.getElementById('signalsContainer');
+            container.innerHTML = currentSignals.map(signal => createSignalCard(signal)).join('');
+            document.getElementById('signalCount').textContent = currentSignals.length;
+        }
+
+        function filterSignals() {
+            const timeframeFilter = document.getElementById('timeframeFilter').value;
+            const pairFilter = document.getElementById('pairFilter').value;
+            
+            currentSignals = signals.filter(signal => {
+                if (timeframeFilter !== 'all' && signal.timeframe !== timeframeFilter) return false;
+                if (pairFilter !== 'all' && signal.category !== pairFilter) return false;
+                return true;
+            });
+            
+            loadSignals();
+        }
+
+        function refreshSignals() {
+            // Simulate new signals
+            signals.forEach(signal => {
+                const priceChange = (Math.random() - 0.5) * 0.001;
+                signal.entry = (parseFloat(signal.entry) + priceChange).toFixed(4);
+                signal.sl = (parseFloat(signal.sl) + priceChange).toFixed(4);
+                signal.tp = (parseFloat(signal.tp) + priceChange).toFixed(4);
+            });
+            
+            filterSignals();
+        }
+
+        function calculateRiskReward() {
+            const entry = parseFloat(document.getElementById('entryPrice').value);
+            const sl = parseFloat(document.getElementById('stopLoss').value);
+            const tp = parseFloat(document.getElementById('takeProfit').value);
+            const accountSize = parseFloat(document.getElementById('accountSize').value) || 10000;
+            
+            if (!entry || !sl || !tp) {
+                alert('Please fill in all price fields');
+                return;
+            }
+            
+            const riskPerTrade = accountSize * 0.02; // 2% risk
+            const riskAmount = Math.abs(entry - sl);
+            const rewardAmount = Math.abs(tp - entry);
+            const riskRewardRatio = rewardAmount / riskAmount;
+            const positionSize = riskPerTrade / riskAmount;
+            
+            document.getElementById('riskAmount').textContent = `$${riskAmount.toFixed(2)}`;
+            document.getElementById('rewardAmount').textContent = `$${(riskAmount * riskRewardRatio).toFixed(2)}`;
+            document.getElementById('riskReward').textContent = `1:${riskRewardRatio.toFixed(2)}`;
+            document.getElementById('positionSize').textContent = `${positionSize.toFixed(2)} lots`;
+            document.getElementById('riskResult').style.display = 'block';
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+        }
+
+        function acceptDisclaimer() {
+            disclaimerAccepted = true;
+            document.getElementById('disclaimerModal').style.display = 'none';
+            localStorage.setItem('disclaimerAccepted', 'true');
+        }
+
+        function checkDisclaimer() {
+            const accepted = localStorage.getItem('disclaimerAccepted');
+            if (accepted === 'true') {
+                document.getElementById('disclaimerModal').style.display = 'none';
+                disclaimerAccepted = true;
+            }
+        }
+
+        // Initialize
+        checkDisclaimer();
+        loadSignals();
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Add event listeners
+        document.getElementById('timeframeFilter').addEventListener('change', filterSignals);
+        document.getElementById('pairFilter').addEventListener('change', filterSignals);
+        
+        // Simulate real-time updates
+        setInterval(() => {
+            if (disclaimerAccepted) {
+                refreshSignals();
+            }
+        }, 10000);
+
+        // Show ad popup after 3 seconds
+        setTimeout(() => {
+            if (disclaimerAccepted) {
+                alert('🔥 SPECIAL OFFER: Get Premium Signals with 95% Accuracy! Limited time - Upgrade now for just $99/month');
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
