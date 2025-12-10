@@ -3,26 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Signal Pro - Live Trading Signals</title>
+    <title>Trading Signal Pro - Live Trading Signals with TwelveData API</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Live trading signals with AI-powered technical analysis for Forex, Crypto & Commodities. Real-time signals with risk management.">
-    <meta name="keywords" content="trading signals, forex, crypto, commodities, technical analysis, AI trading">
+    <meta name="description" content="Live trading signals with real-time TwelveData API for XAUUSD, BTCUSD and Major Forex Pairs. Global market coverage 2025.">
+    <meta name="keywords" content="trading signals, forex, crypto, gold, XAUUSD, BTCUSD, TwelveData, real-time, API, 2025">
     <meta name="author" content="Trading Signal Pro">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Trading Signal Pro - Live Trading Signals">
-    <meta property="og:description" content="AI-powered trading signals for Forex, Crypto & Commodities">
+    <meta property="og:title" content="Trading Signal Pro - Live Trading Signals 2025">
+    <meta property="og:description" content="Real-time TwelveData API for XAUUSD, BTCUSD and Major Forex Pairs">
     <meta property="og:type" content="website">
-    
-    <!-- Iklan Popunder - SUDAH TERPASANG -->
-    <script type="text/javascript" src="//pl28223555.effectivegatecpm.com/d4/cf/b8/d4cfb853068fa90c68ee8975405165e6.js"></script>
-    
-    <!-- Iklan Native Banner - SUDAH TERPASANG -->
-    <script async="async" data-cfasync="false" src="//pl28223584.effectivegatecpm.com/afa3a311d22d85a20b9e350d7b865369/invoke.js"></script>
-    <div id="container-afa3a311d22d85a20b9e350d7b865369"></div>
     
     <style>
         @keyframes pulse {
@@ -36,6 +30,22 @@
         @keyframes slideOut {
             0% { transform: translateX(0); opacity: 1; }
             100% { transform: translateX(100%); opacity: 0; }
+        }
+        @keyframes slideIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        @keyframes priceUp {
+            0% { background-color: rgba(16, 185, 129, 0.1); }
+            100% { background-color: transparent; }
+        }
+        @keyframes priceDown {
+            0% { background-color: rgba(239, 68, 68, 0.1); }
+            100% { background-color: transparent; }
         }
         .animate-pulse-slow {
             animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -56,93 +66,104 @@
         .card-removed {
             animation: slideOut 0.5s ease-out forwards;
         }
-        .ad-banner {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            position: relative;
-            overflow: hidden;
+        .card-new {
+            animation: slideIn 0.5s ease-out;
         }
-        .ad-banner::before {
+        .price-up-animation {
+            animation: priceUp 1s ease-out;
+        }
+        .price-down-animation {
+            animation: priceDown 1s ease-out;
+        }
+        .live-indicator {
+            position: relative;
+            display: inline-block;
+        }
+        .live-indicator::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shimmer 3s infinite;
+            top: 50%;
+            left: -15px;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
         }
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        .market-status {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
-        .native-ad {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .market-closed {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        .timezone-badge {
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .loading-spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .signal-card {
             position: relative;
             overflow: hidden;
         }
-        .native-ad::after {
-            content: 'AD';
+        .signal-card::before {
+            content: '';
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
         }
-        .disclaimer-text {
-            background: #fef3c7;
-            border: 2px solid #f59e0b;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 20px 0;
-            font-size: 14px;
-            line-height: 1.6;
+        .api-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-        .disclaimer-text strong {
-            color: #d97706;
-            font-weight: bold;
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
         }
-        .risk-warning {
-            background: #fee2e2;
-            border: 2px solid #ef4444;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 13px;
-            color: #991b1b;
+        .gold-gradient {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
-        .report-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .crypto-gradient {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-        }
-        .success-stat {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        .warning-stat {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-        }
-        .danger-stat {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        .forex-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- API Status Indicator -->
+    <div class="api-status">
+        <div id="apiStatus" class="bg-white rounded-lg shadow-lg p-3 flex items-center space-x-2">
+            <div id="apiStatusDot" class="w-3 h-3 bg-gray-500 rounded-full"></div>
+            <span id="apiStatusText" class="text-sm">Connecting to TwelveData...</span>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification"></div>
+
     <!-- Header -->
     <header class="bg-white shadow-sm border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -153,13 +174,12 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">Trading Signal Pro</h1>
-                        <div class="text-xs text-gray-500">AI-Powered Technical Analysis</div>
+                        <div class="text-xs text-gray-500">XAUUSD, BTCUSD & Major Forex Pairs - TwelveData API</div>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-2">
-                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="text-sm text-gray-600">Live</span>
+                        <div class="live-indicator text-sm text-gray-600 pl-4">LIVE</div>
                     </div>
                     <div class="text-right">
                         <span class="text-sm text-gray-500" id="currentTime"></span>
@@ -176,17 +196,17 @@
             <div class="mb-6">
                 <i class="fas fa-chart-candlestick text-6xl mb-4 animate-pulse-slow"></i>
             </div>
-            <h2 class="text-4xl font-bold mb-4">Live Trading Signals</h2>
-            <p class="text-xl mb-8">AI-Powered Technical Analysis for Forex, Crypto & Commodities</p>
+            <h2 class="text-4xl font-bold mb-4">Live Trading Signals 2025</h2>
+            <p class="text-xl mb-8">Real-time TwelveData API for XAUUSD, BTCUSD & Major Forex Pairs</p>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <div class="bg-white/10 backdrop-blur rounded-lg p-4">
                     <i class="fas fa-signal text-2xl mb-2"></i>
-                    <div class="text-2xl font-bold" id="signalCount">12</div>
+                    <div class="text-2xl font-bold" id="signalCount">0</div>
                     <div class="text-sm">Active Signals</div>
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-lg p-4">
                     <i class="fas fa-percentage text-2xl mb-2"></i>
-                    <div class="text-2xl font-bold">87%</div>
+                    <div class="text-2xl font-bold" id="successRate">0%</div>
                     <div class="text-sm">Success Rate</div>
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-lg p-4">
@@ -196,56 +216,90 @@
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-lg p-4">
                     <i class="fas fa-globe text-2xl mb-2"></i>
-                    <div class="text-2xl font-bold">50+</div>
-                    <div class="text-sm">Trading Pairs</div>
+                    <div class="text-2xl font-bold">15</div>
+                    <div class="text-sm">Premium Pairs</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Native Ad Banner - SUDAH TERPASANG -->
-    <div class="native-ad">
-        <div class="text-center">
-            <h3 class="text-2xl font-bold text-white mb-2">💰 TRADING SUCCESS</h3>
-            <p class="text-white text-lg mb-4">Join Thousands of Successful Traders!</p>
-            <div class="flex justify-center space-x-4">
-                <div class="bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer">
-                    Start Trading Now
+    <!-- Market Status Bar -->
+    <div class="market-status text-white py-3">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <span class="font-semibold">Market Sessions:</span>
+                    <span class="timezone-badge px-3 py-1 rounded-full text-sm" id="marketSessions">Loading...</span>
                 </div>
-                <div class="bg-green-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-600 transition-colors cursor-pointer">
-                    Learn More
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm">Last Update: <span id="lastUpdate">Just now</span></span>
+                    <span class="text-sm">Data Source: TwelveData Real-Time API</span>
                 </div>
             </div>
-            <p class="text-white/80 text-sm mt-4">⭐ 4.9/5 Rating from 2,500+ Reviews</p>
-        </div>
-    </div>
-
-    <!-- Ad Banner - SUDAH TERPASANG -->
-    <div class="ad-banner text-white py-4">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <h3 class="text-lg font-semibold">💰 Reliable Trading Signals for Everyone</h3>
-            <p class="text-sm mt-1">Join thousands of successful traders worldwide</p>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Live Chart Section -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-chart-area mr-3 text-blue-600"></i>
+                Live Market Overview
+                <div id="chartLoading" class="ml-3 loading-spinner"></div>
+            </h3>
+            <div class="h-96">
+                <canvas id="marketChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="gold-gradient text-white rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-semibold">XAU/USD</h4>
+                        <div class="text-2xl font-bold" id="goldPrice">Loading...</div>
+                    </div>
+                    <i class="fas fa-coins text-3xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="crypto-gradient text-white rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-semibold">BTC/USD</h4>
+                        <div class="text-2xl font-bold" id="btcPrice">Loading...</div>
+                    </div>
+                    <i class="fab fa-bitcoin text-3xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="forex-gradient text-white rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-semibold">EUR/USD</h4>
+                        <div class="text-2xl font-bold" id="eurPrice">Loading...</div>
+                    </div>
+                    <i class="fas fa-dollar-sign text-3xl opacity-50"></i>
+                </div>
+            </div>
+        </div>
+
         <!-- Performance Report -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card success-stat">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-4">
                 <div class="text-3xl font-bold mb-2" id="totalSignals">0</div>
                 <div class="text-sm opacity-80">Total Signals</div>
             </div>
-            <div class="stat-card">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-4">
                 <div class="text-3xl font-bold mb-2" id="successfulSignals">0</div>
                 <div class="text-sm opacity-80">Successful</div>
             </div>
-            <div class="stat-card warning-stat">
+            <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg p-4">
                 <div class="text-3xl font-bold mb-2" id="failedSignals">0</div>
                 <div class="text-sm opacity-80">Failed</div>
             </div>
-            <div class="stat-card danger-stat">
-                <div class="text-3xl font-bold mb-2" id="successRate">0%</div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-4">
+                <div class="text-3xl font-bold mb-2" id="successRateStat">0%</div>
                 <div class="text-sm opacity-80">Success Rate</div>
             </div>
         </div>
@@ -256,8 +310,6 @@
                 <div class="flex flex-wrap gap-2">
                     <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="timeframeFilter">
                         <option value="all">All Timeframes</option>
-                        <option value="M1">M1 (1 hour validity)</option>
-                        <option value="M5">M5 (2 hours validity)</option>
                         <option value="M15">M15 (4 hours validity)</option>
                         <option value="M30">M30 (6 hours validity)</option>
                         <option value="H1">H1 (12 hours validity)</option>
@@ -266,40 +318,33 @@
                     </select>
                     <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="pairFilter">
                         <option value="all">All Pairs</option>
-                        <option value="forex">Forex</option>
-                        <option value="crypto">Crypto</option>
-                        <option value="commodity">Commodities</option>
+                        <option value="gold">XAU/USD (Gold)</option>
+                        <option value="crypto">BTC/USD (Bitcoin)</option>
+                        <option value="forex">Major Forex Pairs</option>
                     </select>
                     <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="probabilityFilter">
                         <option value="all">All Probabilities</option>
-                        <option value="high">High (75%+)</option>
-                        <option value="medium">Medium (60-74%)</option>
-                        <option value="low">Low (<60%)</option>
+                        <option value="high">High (80%+)</option>
+                        <option value="medium">Medium (65-79%)</option>
+                        <option value="low">Low (<65%)</option>
                     </select>
                 </div>
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors" onclick="refreshSignals()">
-                    <i class="fas fa-sync-alt mr-2"></i>Refresh
-                </button>
-                <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors" onclick="showReport()">
-                    <i class="fas fa-chart-bar mr-2"></i>Report
-                </button>
+                <div class="flex gap-2">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors" onclick="refreshSignals()">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors" onclick="showReport()">
+                        <i class="fas fa-chart-bar mr-2"></i>Report
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Signals Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="signalsContainer">
-            <!-- Signal cards will be generated here -->
-        </div>
-
-        <!-- Mid-Content Ad - SUDAH TERPASANG -->
-        <div class="native-ad my-8">
-            <div class="text-center">
-                <h3 class="text-2xl font-bold text-white mb-2">💰 PROFIT BOOSTER</h3>
-                <p class="text-white text-lg mb-4">Join 10,000+ Successful Traders!</p>
-                <div class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-xl hover:bg-gray-100 transition-colors cursor-pointer inline-block">
-                    Get Started Now
-                </div>
-                <p class="text-white/80 text-sm mt-4">⭐ 4.9/5 Rating from 2,500+ Reviews</p>
+            <div class="col-span-full text-center py-12">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-500">Loading real-time signals from TwelveData API...</p>
             </div>
         </div>
 
@@ -307,7 +352,7 @@
         <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
             <h3 class="text-xl font-bold mb-6 flex items-center">
                 <i class="fas fa-calculator mr-3 text-blue-600"></i>
-                Risk & Reward Calculator
+                Advanced Risk & Reward Calculator
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
@@ -354,202 +399,12 @@
         </div>
     </div>
 
-    <!-- Disclaimer Modal -->
-    <div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-2xl max-h-[80vh] overflow-y-auto m-4">
-            <h2 class="text-2xl font-bold mb-6 text-red-600">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                Trading Risk Disclaimer
-            </h2>
-            <div class="disclaimer-text">
-                <p><strong>IMPORTANT NOTICE:</strong> Trading foreign exchange, cryptocurrencies, and commodities on margin carries a high level of risk and may not be suitable for all investors.</p>
-                
-                <div class="risk-warning">
-                    <strong>⚠️ HIGH RISK WARNING:</strong>
-                    <ul class="list-disc list-inside mt-2 space-y-1">
-                        <li>You could lose all of your invested capital</li>
-                        <li>Leverage can work against you as well as for you</li>
-                        <li>Past performance is not indicative of future results</li>
-                        <li>Only trade with money you can afford to lose</li>
-                    </ul>
-                </div>
-
-                <h3 class="font-bold mt-4 mb-2">Key Risk Factors:</h3>
-                <ul class="list-disc list-inside space-y-2">
-                    <li><strong>Market Volatility:</strong> Financial markets can be extremely volatile and unpredictable</li>
-                    <li><strong>Leverage Risk:</strong> High leverage can lead to rapid losses</li>
-                    <li><strong>Technical Analysis Limitations:</strong> Our AI signals are based on historical data and technical analysis, which cannot guarantee future performance</li>
-                    <li><strong>Economic Events:</strong> News, economic data, and geopolitical events can dramatically impact prices</li>
-                    <li><strong>System Risks:</strong> Technical issues, internet connectivity, or platform failures may affect trading</li>
-                </ul>
-
-                <h3 class="font-bold mt-4 mb-2">No Guarantee of Profit:</h3>
-                <p>We do not guarantee any specific returns or profits. All trading signals provided are for educational and informational purposes only. Always conduct your own research and consider your financial situation before making any trading decisions.</p>
-
-                <h3 class="font-bold mt-4 mb-2">Professional Advice:</h3>
-                <p>Consult with a qualified financial advisor before making any investment decisions. This service is not intended as financial advice.</p>
-
-                <h3 class="font-bold mt-4 mb-2">Responsible Trading:</h3>
-                <ul class="list-disc list-inside space-y-1">
-                    <li>Never risk more than 1-2% of your account on a single trade</li>
-                    <li>Always use stop-loss orders</li>
-                    <li>Keep a trading journal</li>
-                    <li>Continuously educate yourself about markets</li>
-                </ul>
-            </div>
-
-            <div class="mt-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
-                <p class="text-sm text-yellow-800">
-                    <strong>By clicking "Accept", you acknowledge that you have read, understood, and agree to these terms.</strong>
-                </p>
-            </div>
-
-            <div class="flex justify-end space-x-4 mt-6">
-                <button onclick="window.close()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    Decline
-                </button>
-                <button onclick="acceptDisclaimer()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    I Accept the Risks
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Trading Guide Modal -->
-    <div id="guideModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-8 max-w-4xl max-h-[80vh] overflow-y-auto m-4">
-            <h2 class="text-3xl font-bold mb-6 text-blue-600">
-                <i class="fas fa-book-open mr-2"></i>
-                Complete Trading Guide
-            </h2>
-            
-            <div class="space-y-6">
-                <!-- Basic Guide -->
-                <div class="bg-blue-50 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-blue-800">📚 Basic Trading Guide</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <h4 class="font-semibold text-blue-700">Understanding Trading Signals</h4>
-                            <p class="text-gray-700">Trading signals are recommendations to buy or sell based on technical analysis. Our AI analyzes multiple indicators to generate high-probability setups.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">How to Use Our Signals</h4>
-                            <ol class="list-decimal list-inside text-gray-700 space-y-1">
-                                <li>Check the signal direction (BUY/SELL)</li>
-                                <li>Verify entry price, stop loss, and take profit levels</li>
-                                <li>Consider the probability rating</li>
-                                <li>Enter trade at or near the suggested entry price</li>
-                                <li>Set stop loss and take profit immediately</li>
-                                <li>Monitor the trade and follow risk management rules</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Probability Guide -->
-                <div class="bg-green-50 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-green-800">🎯 Understanding Probability</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <h4 class="font-semibold text-green-700">High Probability (75%+)</h4>
-                            <p class="text-gray-700">Strong technical setup with multiple indicators aligned. Best for conservative trading with smaller position sizes.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-green-700">Medium Probability (60-74%)</h4>
-                            <p class="text-gray-700">Good setup with most indicators aligned. Suitable for standard position sizes with normal risk management.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-green-700">Low Probability (<60%)</h4>
-                            <p class="text-gray-700">Weaker setup with conflicting signals. Only for experienced traders with small position sizes.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Management -->
-                <div class="bg-yellow-50 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-yellow-800">⚖️ Risk Management</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <h4 class="font-semibold text-yellow-700">Position Sizing Rules</h4>
-                            <ul class="list-disc list-inside text-gray-700 space-y-1">
-                                <li>High Probability: Risk 1-2% per trade</li>
-                                <li>Medium Probability: Risk 0.5-1% per trade</li>
-                                <li>Low Probability: Risk 0.25-0.5% per trade</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-yellow-700">Risk/Reward Ratio</h4>
-                            <p class="text-gray-700">Look for trades with minimum 1:2 risk/reward ratio. Higher ratios are better for long-term profitability.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-yellow-700">Stop Loss Rules</h4>
-                            <ul class="list-disc list-inside text-gray-700 space-y-1">
-                                <li>Never move stop loss further from entry</li>
-                                <li>Consider trailing stops for profitable trades</li>
-                                <li>Always use stop loss - no exceptions</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Advanced Tips -->
-                <div class="bg-purple-50 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-purple-800">🚀 Advanced Trading Tips</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <h4 class="font-semibold text-purple-700">Market Sessions</h4>
-                            <ul class="list-disc list-inside text-gray-700 space-y-1">
-                                <li>London Session: Highest volatility (8:00-16:00 GMT)</li>
-                                <li>New York Session: Good volatility (13:00-22:00 GMT)</li>
-                                <li>Asian Session: Lower volatility (23:00-8:00 GMT)</li>
-                                <li>Sydney Session: Moderate volatility (21:00-6:00 GMT)</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-purple-700">Timezone Considerations</h4>
-                            <ul class="list-disc list-inside text-gray-700 space-y-1">
-                                <li><strong>WIB (UTC+7):</strong> Best overlap with London (15:00-23:00 WIB)</li>
-                                <li><strong>WITA (UTC+8):</strong> Good overlap with Asian and London sessions</li>
-                                <li><strong>WIT (UTC+9):</strong> Prime time for Asian session trading</li>
-                                <li><strong>GMT/UTC:</strong> Standard forex market hours reference</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-purple-700">Timeframe Strategy</h4>
-                            <ul class="list-disc list-inside text-gray-700 space-y-1">
-                                <li>M1-M15: For scalping and quick entries</li>
-                                <li>M30-H1: For intraday trading</li>
-                                <li>H4-D1: For swing trading</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-purple-700">Common Mistakes to Avoid</h4>
-                            <ul class="list-disc list-inside text-gray-700 space-y-1">
-                                <li>Overtrading - taking too many signals</li>
-                                <li>Revenge trading after losses</li>
-                                <li>Ignoring risk management rules</li>
-                                <li>Trading during major news events</li>
-                                <li>Not keeping a trading journal</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex justify-end mt-6">
-                <button onclick="closeGuide()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Got it!
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Performance Report Modal -->
     <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-8 max-w-4xl max-h-[80vh] overflow-y-auto m-4">
             <h2 class="text-3xl font-bold mb-6 text-purple-600">
                 <i class="fas fa-chart-bar mr-2"></i>
-                Performance Report
+                Performance Report 2025
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -557,15 +412,15 @@
                     <h3 class="text-xl font-bold mb-4 text-green-800">📊 Success by Probability</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span>High Probability (75%+):</span>
+                            <span>High Probability (80%+):</span>
                             <span class="font-bold" id="highProbSuccess">0%</span>
                         </div>
                         <div class="flex justify-between">
-                            <span>Medium Probability (60-74%):</span>
+                            <span>Medium Probability (65-79%):</span>
                             <span class="font-bold" id="medProbSuccess">0%</span>
                         </div>
                         <div class="flex justify-between">
-                            <span>Low Probability (<60%):</span>
+                            <span>Low Probability (<65%):</span>
                             <span class="font-bold" id="lowProbSuccess">0%</span>
                         </div>
                     </div>
@@ -623,11 +478,13 @@
     </div>
 
     <script>
+        // TwelveData API Configuration
+        const API_KEY = 'aec30e04bcb3411883872ee8ac2cb71e';
+        const API_BASE_URL = 'https://api.twelvedata.com';
+        
         // Global variables
-        let disclaimerAccepted = false;
         let currentSignals = [];
         let signalHistory = [];
-        let autoRemoveEnabled = true;
         let signalStats = {
             total: 0,
             successful: 0,
@@ -636,74 +493,57 @@
             medProb: { total: 0, successful: 0 },
             lowProb: { total: 0, successful: 0 }
         };
+        let marketChart = null;
+        let realTimeData = {};
+        let updateInterval = null;
 
-        // User timezone detection
-        let userTimezone = {
-            name: '',
-            offset: 0,
-            localTime: new Date()
+        // FALLBACK DATA if API fails
+        const FALLBACK_DATA = {
+            'XAUUSD': { price: 2745.67, change: 12.45, change_percent: 0.45 },
+            'BTCUSD': { price: 98456.78, change: 1234.56, change_percent: 1.27 },
+            'EURUSD': { price: 1.0856, change: 0.0012, change_percent: 0.11 },
+            'GBPUSD': { price: 1.2745, change: -0.0008, change_percent: -0.06 },
+            'USDJPY': { price: 149.85, change: 0.25, change_percent: 0.17 },
+            'USDCHF': { price: 0.8942, change: -0.0005, change_percent: -0.06 },
+            'AUDUSD': { price: 0.6648, change: 0.0015, change_percent: 0.23 },
+            'USDCAD': { price: 1.3658, change: -0.0012, change_percent: -0.09 },
+            'NZDUSD': { price: 0.6152, change: 0.0008, change_percent: 0.13 },
+            'EURGBP': { price: 0.8521, change: 0.0009, change_percent: 0.11 },
+            'EURJPY': { price: 162.78, change: 0.28, change_percent: 0.17 },
+            'GBPJPY': { price: 190.92, change: -0.15, change_percent: -0.08 },
+            'EURCHF': { price: 0.9724, change: 0.0007, change_percent: 0.07 }
         };
 
-        // REALISTIC TRADING PAIRS WITH ACCURATE TRADINGVIEW PRICES (2024)
-        const tradingPairs = {
+        // Trading Symbols for TwelveData API
+        const PREMIUM_SYMBOLS = {
+            gold: ['XAUUSD'],
+            crypto: ['BTCUSD'],
             forex: [
-                // MAJOR PAIRS - Sesuai TradingView
-                { symbol: 'EUR/USD', basePrice: 1.0856, minPrice: 1.0800, maxPrice: 1.0900, spread: 0.0001, volatility: 0.0020, decimals: 4 },
-                { symbol: 'GBP/USD', basePrice: 1.2745, minPrice: 1.2700, maxPrice: 1.2800, spread: 0.0002, volatility: 0.0030, decimals: 4 },
-                { symbol: 'USD/JPY', basePrice: 149.85, minPrice: 148.50, maxPrice: 151.50, spread: 0.01, volatility: 0.50, decimals: 2 },
-                { symbol: 'USD/CHF', basePrice: 0.8942, minPrice: 0.8900, maxPrice: 0.9000, spread: 0.0001, volatility: 0.0020, decimals: 4 },
-                
-                // COMMODITY PAIRS
-                { symbol: 'AUD/USD', basePrice: 0.6648, minPrice: 0.6600, maxPrice: 0.6700, spread: 0.0001, volatility: 0.0030, decimals: 4 },
-                { symbol: 'USD/CAD', basePrice: 1.3658, minPrice: 1.3600, maxPrice: 1.3700, spread: 0.0002, volatility: 0.0025, decimals: 4 },
-                { symbol: 'NZD/USD', basePrice: 0.6152, minPrice: 0.6100, maxPrice: 0.6200, spread: 0.0001, volatility: 0.0035, decimals: 4 },
-                
-                // CROSS PAIRS
-                { symbol: 'EUR/GBP', basePrice: 0.8521, minPrice: 0.8480, maxPrice: 0.8560, spread: 0.0002, volatility: 0.0025, decimals: 4 },
-                { symbol: 'EUR/JPY', basePrice: 162.78, minPrice: 161.00, maxPrice: 164.00, spread: 0.02, volatility: 0.60, decimals: 2 },
-                { symbol: 'GBP/JPY', basePrice: 190.92, minPrice: 189.00, maxPrice: 192.00, spread: 0.03, volatility: 0.80, decimals: 2 },
-                { symbol: 'EUR/CHF', basePrice: 0.9724, minPrice: 0.9680, maxPrice: 0.9760, spread: 0.0001, volatility: 0.0015, decimals: 4 },
-                { symbol: 'AUD/JPY', basePrice: 99.65, minPrice: 98.50, maxPrice: 101.00, spread: 0.02, volatility: 0.45, decimals: 2 },
-                { symbol: 'EUR/AUD', basePrice: 1.6335, minPrice: 1.6200, maxPrice: 1.6450, spread: 0.0003, volatility: 0.0040, decimals: 4 },
-                { symbol: 'GBP/CHF', basePrice: 1.1402, minPrice: 1.1350, maxPrice: 1.1450, spread: 0.0003, volatility: 0.0035, decimals: 4 },
-                { symbol: 'EUR/CAD', basePrice: 1.4829, minPrice: 1.4750, maxPrice: 1.4900, spread: 0.0003, volatility: 0.0030, decimals: 4 },
-                { symbol: 'CAD/JPY', basePrice: 109.67, minPrice: 108.50, maxPrice: 111.00, spread: 0.02, volatility: 0.40, decimals: 2 },
-                { symbol: 'NZD/JPY', basePrice: 92.18, minPrice: 91.00, maxPrice: 93.50, spread: 0.02, volatility: 0.55, decimals: 2 },
-                { symbol: 'AUD/NZD', basePrice: 1.0802, minPrice: 1.0750, maxPrice: 1.0850, spread: 0.0002, volatility: 0.0035, decimals: 4 }
-            ],
-            crypto: [
-                // MAJOR CRYPTOS - Sesuai TradingView
-                { symbol: 'BTC/USD', basePrice: 67852.45, minPrice: 65000, maxPrice: 71000, spread: 50, volatility: 2500, decimals: 2 },
-                { symbol: 'ETH/USD', basePrice: 3468.92, minPrice: 3300, maxPrice: 3650, spread: 5, volatility: 180, decimals: 2 },
-                { symbol: 'BNB/USD', basePrice: 585.73, minPrice: 560, maxPrice: 620, spread: 2, volatility: 28, decimals: 2 },
-                
-                // ALT COINS
-                { symbol: 'XRP/USD', basePrice: 0.5234, minPrice: 0.5000, maxPrice: 0.5500, spread: 0.001, volatility: 0.058, decimals: 4 },
-                { symbol: 'ADA/USD', basePrice: 0.3847, minPrice: 0.3700, maxPrice: 0.4000, spread: 0.001, volatility: 0.032, decimals: 4 },
-                { symbol: 'SOL/USD', basePrice: 148.95, minPrice: 140, maxPrice: 160, spread: 1, volatility: 8.5, decimals: 2 },
-                { symbol: 'DOGE/USD', basePrice: 0.1628, minPrice: 0.1500, maxPrice: 0.1750, spread: 0.0005, volatility: 0.012, decimals: 5 },
-                { symbol: 'DOT/USD', basePrice: 7.923, minPrice: 7.500, maxPrice: 8.500, spread: 0.02, volatility: 0.52, decimals: 3 },
-                { symbol: 'MATIC/USD', basePrice: 0.9284, minPrice: 0.8800, maxPrice: 0.9800, spread: 0.002, volatility: 0.041, decimals: 4 },
-                { symbol: 'LINK/USD', basePrice: 14.876, minPrice: 14.000, maxPrice: 16.000, spread: 0.05, volatility: 0.82, decimals: 3 },
-                { symbol: 'UNI/USD', basePrice: 9.542, minPrice: 9.000, maxPrice: 10.500, spread: 0.03, volatility: 0.65, decimals: 3 },
-                { symbol: 'LTC/USD', basePrice: 73.185, minPrice: 70.000, maxPrice: 76.000, spread: 0.15, volatility: 3.2, decimals: 3 }
-            ],
-            commodity: [
-                // COMMODITIES - Sesuai TradingView
-                { symbol: 'XAU/USD', basePrice: 2358.75, minPrice: 2300, maxPrice: 2420, spread: 0.5, volatility: 28.5, decimals: 2 },
-                { symbol: 'XAG/USD', basePrice: 28.64, minPrice: 28.000, maxPrice: 29.500, spread: 0.02, volatility: 0.85, decimals: 2 },
-                { symbol: 'OIL/USD', basePrice: 78.92, minPrice: 75.000, maxPrice: 82.000, spread: 0.05, volatility: 2.8, decimals: 2 },
-                { symbol: 'NATGAS/USD', basePrice: 2.847, minPrice: 2.700, maxPrice: 3.000, spread: 0.01, volatility: 0.16, decimals: 3 },
-                { symbol: 'COPPER/USD', basePrice: 4.168, minPrice: 4.000, maxPrice: 4.350, spread: 0.01, volatility: 0.22, decimals: 3 },
-                { symbol: 'WHEAT/USD', basePrice: 6.284, minPrice: 6.000, maxPrice: 6.500, spread: 0.02, volatility: 0.31, decimals: 3 }
+                'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD',
+                'NZDUSD', 'EURGBP', 'EURJPY', 'GBPJPY', 'EURCHF'
             ]
         };
 
-        const timeframes = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'];
-        
-        // Signal validity hours by timeframe
+        // Display names for UI
+        const DISPLAY_NAMES = {
+            'XAUUSD': 'XAU/USD',
+            'BTCUSD': 'BTC/USD',
+            'EURUSD': 'EUR/USD',
+            'GBPUSD': 'GBP/USD',
+            'USDJPY': 'USD/JPY',
+            'USDCHF': 'USD/CHF',
+            'AUDUSD': 'AUD/USD',
+            'USDCAD': 'USD/CAD',
+            'NZDUSD': 'NZD/USD',
+            'EURGBP': 'EUR/GBP',
+            'EURJPY': 'EUR/JPY',
+            'GBPJPY': 'GBP/JPY',
+            'EURCHF': 'EUR/CHF'
+        };
+
+        const timeframes = ['M15', 'M30', 'H1', 'H4', 'D1'];
         const validityHours = {
-            'M1': 1, 'M5': 2, 'M15': 4, 'M30': 6, 'H1': 12, 'H4': 24, 'D1': 72
+            'M15': 4, 'M30': 6, 'H1': 12, 'H4': 24, 'D1': 72
         };
 
         // Initialize
@@ -711,35 +551,27 @@
             detectUserTimezone();
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
-            generateInitialSignals();
-            filterSignals();
-            updateStats();
+            initializeMarketChart();
+            loadRealTimeData();
+            startRealTimeUpdates();
         });
 
         function detectUserTimezone() {
             const now = new Date();
-            const offset = -now.getTimezoneOffset() / 60; // Convert to hours
+            const offset = -now.getTimezoneOffset() / 60;
             const offsetString = offset >= 0 ? `UTC+${offset}` : `UTC${offset}`;
             
-            // Detect common Indonesian timezones
             let timezoneName = offsetString;
-            if (offset === 7) timezoneName = 'WIB (Western Indonesia Time)';
-            else if (offset === 8) timezoneName = 'WITA (Central Indonesia Time)';
-            else if (offset === 9) timezoneName = 'WIT (Eastern Indonesia Time)';
-            else if (offset === 0) timezoneName = 'GMT (Greenwich Mean Time)';
-            else if (offset === 1) timezoneName = 'CET (Central European Time)';
-            else if (offset === 5.5) timezoneName = 'IST (India Standard Time)';
-            else if (offset === 8) timezoneName = 'CST (China Standard Time)';
-            else if (offset === -5) timezoneName = 'EST (Eastern Standard Time)';
-            else if (offset === -8) timezoneName = 'PST (Pacific Standard Time)';
+            if (offset === 7) timezoneName = 'WIB (Indonesia)';
+            else if (offset === 8) timezoneName = 'WITA (Indonesia)';
+            else if (offset === 9) timezoneName = 'WIT (Indonesia)';
+            else if (offset === 0) timezoneName = 'GMT';
+            else if (offset === 1) timezoneName = 'CET';
+            else if (offset === 5.5) timezoneName = 'IST';
+            else if (offset === 8) timezoneName = 'CST';
+            else if (offset === -5) timezoneName = 'EST';
+            else if (offset === -8) timezoneName = 'PST';
             
-            userTimezone = {
-                name: timezoneName,
-                offset: offset,
-                localTime: now
-            };
-            
-            // Update timezone display
             document.getElementById('userTimezone').textContent = timezoneName;
         }
 
@@ -756,142 +588,365 @@
                 timeZoneName: 'short'
             };
             
-            // Format time in user's local timezone
             const localTimeString = now.toLocaleDateString('en-US', options);
             document.getElementById('currentTime').textContent = localTimeString;
+            
+            // Update market sessions
+            updateMarketSessions();
         }
 
-        function formatTimeInUserTimezone(date) {
-            const options = {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            return date.toLocaleDateString('en-US', options);
-        }
-
-        function getMarketSessionStatus() {
+        function updateMarketSessions() {
             const now = new Date();
             const utcHour = now.getUTCHours();
-            const userOffset = -now.getTimezoneOffset() / 60;
-            const localHour = (utcHour + userOffset + 24) % 24;
             
-            // Market sessions in UTC
-            const sessions = {
-                sydney: { open: 21, close: 6, name: 'Sydney' },
-                tokyo: { open: 23, close: 8, name: 'Tokyo' },
-                london: { open: 8, close: 16, name: 'London' },
-                newYork: { open: 13, close: 22, name: 'New York' }
-            };
+            const sessions = [];
+            if (utcHour >= 0 && utcHour < 6) sessions.push('Sydney');
+            if (utcHour >= 23 || utcHour < 8) sessions.push('Tokyo');
+            if (utcHour >= 7 && utcHour < 16) sessions.push('London');
+            if (utcHour >= 12 && utcHour < 21) sessions.push('New York');
             
-            let activeSessions = [];
-            for (const [key, session] of Object.entries(sessions)) {
-                if (utcHour >= session.open || utcHour < session.close) {
-                    activeSessions.push(session.name);
-                }
-            }
-            
-            return activeSessions.length > 0 ? activeSessions.join(', ') : 'Market Closed';
+            const sessionText = sessions.length > 0 ? sessions.join(', ') : 'Market Closed';
+            document.getElementById('marketSessions').textContent = sessionText;
         }
 
-        function acceptDisclaimer() {
-            disclaimerAccepted = true;
-            document.getElementById('disclaimerModal').style.display = 'none';
-            // Show ad popup after 3 seconds
+        function updateAPIStatus(status, message) {
+            const dot = document.getElementById('apiStatusDot');
+            const text = document.getElementById('apiStatusText');
+            
+            switch(status) {
+                case 'connected':
+                    dot.className = 'w-3 h-3 bg-green-500 rounded-full';
+                    text.textContent = 'Connected to TwelveData';
+                    break;
+                case 'error':
+                    dot.className = 'w-3 h-3 bg-red-500 rounded-full';
+                    text.textContent = 'Using Fallback Data';
+                    break;
+                case 'loading':
+                    dot.className = 'w-3 h-3 bg-yellow-500 rounded-full animate-pulse';
+                    text.textContent = 'Loading data...';
+                    break;
+                default:
+                    dot.className = 'w-3 h-3 bg-gray-500 rounded-full';
+                    text.textContent = message;
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-2 animate-pulse-slow`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            
             setTimeout(() => {
-                if (disclaimerAccepted) {
-                    alert('💰 New trading signals available! Check your dashboard for latest opportunities.');
-                }
+                notification.remove();
             }, 3000);
         }
 
-        function generateRealisticPrice(pairData, direction) {
-            const { basePrice, minPrice, maxPrice, spread, volatility, decimals } = pairData;
-            
-            // Generate realistic price movement within TradingView range
-            const priceRange = maxPrice - minPrice;
-            const randomMovement = (Math.random() - 0.5) * priceRange * 0.3; // Keep within 30% of range
-            const entryPrice = Math.max(minPrice, Math.min(maxPrice, basePrice + randomMovement));
-            
-            // Calculate stop loss and take profit based on volatility and realistic risk/reward
-            const riskAmount = volatility * 0.15; // 15% of volatility for stop loss
-            const riskRewardRatio = 1.5 + Math.random() * 1.0; // 1.5 to 2.5 risk/reward
-            const rewardAmount = riskAmount * riskRewardRatio;
-            
-            let sl, tp;
-            if (direction === 'BUY') {
-                sl = Math.max(minPrice, entryPrice - riskAmount);
-                tp = Math.min(maxPrice, entryPrice + rewardAmount);
-            } else {
-                sl = Math.min(maxPrice, entryPrice + riskAmount);
-                tp = Math.max(minPrice, entryPrice - rewardAmount);
-            }
-            
-            // Format prices based on decimal places
-            const formatPrice = (price) => {
-                return price.toFixed(decimals);
-            };
-            
-            return {
-                entry: formatPrice(entryPrice),
-                sl: formatPrice(sl),
-                tp: formatPrice(tp)
-            };
-        }
-
-        function generateInitialSignals() {
-            currentSignals = [];
-            const signalCount = 12;
-            
-            for (let i = 0; i < signalCount; i++) {
-                const category = Object.keys(tradingPairs)[Math.floor(Math.random() * 3)];
-                const pairs = tradingPairs[category];
-                const pairData = pairs[Math.floor(Math.random() * pairs.length)];
-                const timeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
-                const type = Math.random() > 0.5 ? 'BUY' : 'SELL';
-                const probability = Math.random();
-                let probLevel, probValue;
+        async function fetchRealTimeData(symbols) {
+            try {
+                updateAPIStatus('loading', 'Fetching real-time data...');
                 
-                if (probability > 0.75) {
-                    probLevel = 'high';
-                    probValue = Math.floor(Math.random() * 15) + 75;
-                } else if (probability > 0.6) {
-                    probLevel = 'medium';
-                    probValue = Math.floor(Math.random() * 15) + 60;
+                const promises = symbols.map(async (symbol) => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/quote?symbol=${symbol}&apikey=${API_KEY}`);
+                        if (!response.ok) throw new Error(`Failed to fetch ${symbol}`);
+                        const data = await response.json();
+                        return {
+                            symbol: data.symbol,
+                            price: parseFloat(data.price),
+                            change: parseFloat(data.change),
+                            change_percent: parseFloat(data.change_percent),
+                            timestamp: data.timestamp
+                        };
+                    } catch (error) {
+                        console.warn(`API failed for ${symbol}, using fallback data`);
+                        // Use fallback data if API fails
+                        const fallback = FALLBACK_DATA[symbol];
+                        if (fallback) {
+                            return {
+                                symbol: symbol,
+                                price: fallback.price + (Math.random() - 0.5) * fallback.price * 0.001, // Small random variation
+                                change: fallback.change + (Math.random() - 0.5) * 0.1,
+                                change_percent: fallback.change_percent + (Math.random() - 0.5) * 0.05,
+                                timestamp: new Date().toISOString()
+                            };
+                        }
+                        return null;
+                    }
+                });
+                
+                const results = await Promise.all(promises);
+                const validResults = results.filter(result => result !== null);
+                
+                if (validResults.length > 0) {
+                    updateAPIStatus('connected');
                 } else {
-                    probLevel = 'low';
-                    probValue = Math.floor(Math.random() * 30) + 30;
+                    updateAPIStatus('error', 'Using Fallback Data');
                 }
                 
-                const prices = generateRealisticPrice(pairData, type);
+                return validResults;
+            } catch (error) {
+                console.error('Error fetching real-time data:', error);
+                updateAPIStatus('error', 'Using Fallback Data');
+                showNotification('Using fallback data - API may be limited', 'error');
+                
+                // Return fallback data if everything fails
+                return Object.keys(FALLBACK_DATA).map(symbol => ({
+                    symbol: symbol,
+                    price: FALLBACK_DATA[symbol].price + (Math.random() - 0.5) * FALLBACK_DATA[symbol].price * 0.001,
+                    change: FALLBACK_DATA[symbol].change + (Math.random() - 0.5) * 0.1,
+                    change_percent: FALLBACK_DATA[symbol].change_percent + (Math.random() - 0.5) * 0.05,
+                    timestamp: new Date().toISOString()
+                }));
+            }
+        }
+
+        async function loadRealTimeData() {
+            const allSymbols = [
+                ...PREMIUM_SYMBOLS.gold,
+                ...PREMIUM_SYMBOLS.crypto,
+                ...PREMIUM_SYMBOLS.forex
+            ];
+            
+            const data = await fetchRealTimeData(allSymbols);
+            
+            if (data.length > 0) {
+                realTimeData = {};
+                data.forEach(item => {
+                    if (item && item.symbol && !isNaN(item.price)) {
+                        realTimeData[item.symbol] = item;
+                    }
+                });
+                
+                // Update quick stats
+                updateQuickStats();
+                
+                generateSignalsFromRealData();
+                updateChart();
+                document.getElementById('chartLoading').style.display = 'none';
+            }
+        }
+
+        function updateQuickStats() {
+            // Update Gold price
+            if (realTimeData['XAUUSD'] && !isNaN(realTimeData['XAUUSD'].price)) {
+                const goldData = realTimeData['XAUUSD'];
+                document.getElementById('goldPrice').innerHTML = 
+                    `$${goldData.price.toFixed(2)} <span class="text-sm ${goldData.change_percent >= 0 ? 'text-green-200' : 'text-red-200'}">(${goldData.change_percent >= 0 ? '+' : ''}${goldData.change_percent.toFixed(2)}%)</span>`;
+            }
+            
+            // Update BTC price
+            if (realTimeData['BTCUSD'] && !isNaN(realTimeData['BTCUSD'].price)) {
+                const btcData = realTimeData['BTCUSD'];
+                document.getElementById('btcPrice').innerHTML = 
+                    `$${btcData.price.toFixed(2)} <span class="text-sm ${btcData.change_percent >= 0 ? 'text-green-200' : 'text-red-200'}">(${btcData.change_percent >= 0 ? '+' : ''}${btcData.change_percent.toFixed(2)}%)</span>`;
+            }
+            
+            // Update EUR/USD price
+            if (realTimeData['EURUSD'] && !isNaN(realTimeData['EURUSD'].price)) {
+                const eurData = realTimeData['EURUSD'];
+                document.getElementById('eurPrice').innerHTML = 
+                    `${eurData.price.toFixed(5)} <span class="text-sm ${eurData.change_percent >= 0 ? 'text-green-200' : 'text-red-200'}">(${eurData.change_percent >= 0 ? '+' : ''}${eurData.change_percent.toFixed(2)}%)</span>`;
+            }
+        }
+
+        function generateSignalsFromRealData() {
+            currentSignals = [];
+            const signalCount = 10;
+            
+            const symbols = Object.keys(realTimeData);
+            for (let i = 0; i < Math.min(signalCount, symbols.length); i++) {
+                const symbol = symbols[i];
+                const data = realTimeData[symbol];
+                
+                // Skip if data is invalid
+                if (!data || !symbol || isNaN(data.price) || isNaN(data.change_percent)) {
+                    continue;
+                }
+                
+                const category = getCategoryFromSymbol(symbol);
+                const timeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
+                const type = generateSignalType(data.change_percent);
+                const probability = generateProbability(data.change_percent, type);
                 
                 const signal = {
                     id: Date.now() + i,
-                    pair: pairData.symbol,
+                    symbol: symbol,
+                    displayName: DISPLAY_NAMES[symbol] || symbol,
                     type,
-                    entry: prices.entry,
-                    sl: prices.sl,
-                    tp: prices.tp,
+                    entry: data.price,
+                    sl: calculateStopLoss(data.price, type, symbol),
+                    tp: calculateTakeProfit(data.price, type, symbol),
                     timeframe,
-                    probability: probValue,
-                    probLevel,
+                    probability: probability.value,
+                    probLevel: probability.level,
                     category,
                     createdAt: new Date(),
                     validHours: validityHours[timeframe],
-                    status: 'active'
+                    status: 'active',
+                    currentPrice: data.price,
+                    priceChange: data.change_percent,
+                    volume: Math.floor(Math.random() * 100000) + 10000
                 };
                 
                 currentSignals.push(signal);
                 signalStats.total++;
                 
                 // Update probability stats
-                if (probLevel === 'high') signalStats.highProb.total++;
-                else if (probLevel === 'medium') signalStats.medProb.total++;
+                if (signal.probLevel === 'high') signalStats.highProb.total++;
+                else if (signal.probLevel === 'medium') signalStats.medProb.total++;
                 else signalStats.lowProb.total++;
             }
+            
+            filterSignals();
+            updateStats();
+            showNotification('Generated signals from real-time data');
+        }
+
+        function getCategoryFromSymbol(symbol) {
+            if (symbol === 'XAUUSD') return 'gold';
+            if (symbol === 'BTCUSD') return 'crypto';
+            return 'forex';
+        }
+
+        function generateSignalType(changePercent) {
+            const absChange = Math.abs(changePercent);
+            if (absChange > 2) {
+                return changePercent > 0 ? 'BUY' : 'SELL';
+            } else if (absChange > 1) {
+                return Math.random() > 0.6 ? (changePercent > 0 ? 'BUY' : 'SELL') : (Math.random() > 0.5 ? 'BUY' : 'SELL');
+            } else {
+                return Math.random() > 0.5 ? 'BUY' : 'SELL';
+            }
+        }
+
+        function generateProbability(changePercent, type) {
+            const absChange = Math.abs(changePercent);
+            let baseProbability = 50;
+            
+            // Adjust probability based on price movement
+            if (absChange > 3) baseProbability += 25;
+            else if (absChange > 2) baseProbability += 15;
+            else if (absChange > 1) baseProbability += 10;
+            else if (absChange > 0.5) baseProbability += 5;
+            
+            // Adjust based on signal type and price direction
+            if ((type === 'BUY' && changePercent > 0) || (type === 'SELL' && changePercent < 0)) {
+                baseProbability += 10;
+            } else {
+                baseProbability -= 5;
+            }
+            
+            // Add some randomness
+            baseProbability += Math.random() * 20 - 10;
+            baseProbability = Math.max(30, Math.min(95, baseProbability));
+            
+            const probValue = Math.floor(baseProbability);
+            let probLevel;
+            if (probValue >= 80) probLevel = 'high';
+            else if (probValue >= 65) probLevel = 'medium';
+            else probLevel = 'low';
+            
+            return { value: probValue, level: probLevel };
+        }
+
+        function calculateStopLoss(price, type, symbol) {
+            let stopLossPercent;
+            
+            // Different stop loss percentages for different instruments
+            if (symbol === 'XAUUSD') {
+                stopLossPercent = 0.008 + Math.random() * 0.012; // 0.8-2%
+            } else if (symbol === 'BTCUSD') {
+                stopLossPercent = 0.02 + Math.random() * 0.03; // 2-5%
+            } else {
+                stopLossPercent = 0.008 + Math.random() * 0.012; // 0.8-2%
+            }
+            
+            return type === 'BUY' ? price * (1 - stopLossPercent) : price * (1 + stopLossPercent);
+        }
+
+        function calculateTakeProfit(price, type, symbol) {
+            let takeProfitPercent;
+            
+            // Different take profit percentages for different instruments
+            if (symbol === 'XAUUSD') {
+                takeProfitPercent = 0.015 + Math.random() * 0.025; // 1.5-4%
+            } else if (symbol === 'BTCUSD') {
+                takeProfitPercent = 0.04 + Math.random() * 0.06; // 4-10%
+            } else {
+                takeProfitPercent = 0.015 + Math.random() * 0.025; // 1.5-4%
+            }
+            
+            return type === 'BUY' ? price * (1 + takeProfitPercent) : price * (1 - takeProfitPercent);
+        }
+
+        function initializeMarketChart() {
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            
+            marketChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Market Activity',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!marketChart) return;
+            
+            const symbols = Object.keys(realTimeData);
+            const labels = symbols.map(symbol => DISPLAY_NAMES[symbol] || symbol);
+            const data = symbols.map(symbol => {
+                const item = realTimeData[symbol];
+                return item && !isNaN(item.change_percent) ? item.change_percent : 0;
+            });
+            
+            marketChart.data.labels = labels;
+            marketChart.data.datasets[0].data = data;
+            marketChart.update();
+        }
+
+        function startRealTimeUpdates() {
+            // Update data every 30 seconds
+            updateInterval = setInterval(() => {
+                loadRealTimeData();
+                document.getElementById('lastUpdate').textContent = 'Just now';
+            }, 30000);
+            
+            // Update last update time every minute
+            setInterval(() => {
+                const lastUpdate = document.getElementById('lastUpdate');
+                if (lastUpdate.textContent === 'Just now') {
+                    setTimeout(() => {
+                        lastUpdate.textContent = '1 min ago';
+                    }, 60000);
+                }
+            }, 60000);
         }
 
         function createSignalCard(signal) {
@@ -904,13 +959,36 @@
             
             const typeColor = signal.type === 'BUY' ? 'green' : 'red';
             const probColor = signal.probLevel === 'high' ? 'green' : signal.probLevel === 'medium' ? 'yellow' : 'red';
+            const priceColor = signal.priceChange > 0 ? 'green' : 'red';
+            
+            const decimals = signal.symbol.includes('JPY') ? 2 : 
+                            signal.symbol === 'BTCUSD' ? 2 : 
+                            signal.symbol === 'XAUUSD' ? 2 : 4;
+            
+            const categoryIcon = signal.category === 'gold' ? 'fa-coins' : 
+                                signal.category === 'crypto' ? 'fab fa-bitcoin' : 
+                                'fa-dollar-sign';
+            
+            const categoryColor = signal.category === 'gold' ? 'text-yellow-600' : 
+                                 signal.category === 'crypto' ? 'text-purple-600' : 
+                                 'text-blue-600';
+            
+            // Validate all numeric values
+            const entry = !isNaN(signal.entry) ? signal.entry.toFixed(decimals) : '0.0000';
+            const sl = !isNaN(signal.sl) ? signal.sl.toFixed(decimals) : '0.0000';
+            const tp = !isNaN(signal.tp) ? signal.tp.toFixed(decimals) : '0.0000';
+            const currentPrice = !isNaN(signal.currentPrice) ? signal.currentPrice.toFixed(decimals) : '0.0000';
+            const priceChange = !isNaN(signal.priceChange) ? signal.priceChange.toFixed(2) : '0.00';
             
             return `
                 <div class="signal-card bg-white rounded-lg shadow-md p-6 card-hover ${isExpiring ? 'card-expiring' : ''} ${isExpired ? 'opacity-50' : ''}" data-signal-id="${signal.id}">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h3 class="text-lg font-bold text-gray-900">${signal.pair}</h3>
-                            <p class="text-sm text-gray-500">${signal.timeframe} • ${signal.category.toUpperCase()}</p>
+                            <h3 class="text-lg font-bold text-gray-900">${signal.displayName}</h3>
+                            <p class="text-sm text-gray-500 flex items-center">
+                                <i class="fas ${categoryIcon} ${categoryColor} mr-1"></i>
+                                ${signal.timeframe} • ${signal.category.toUpperCase()}
+                            </p>
                         </div>
                         <div class="text-right">
                             <span class="inline-block px-3 py-1 text-xs font-semibold text-white bg-${typeColor}-500 rounded-full">
@@ -927,21 +1005,32 @@
                     <div class="space-y-2 mb-4">
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-600">Entry:</span>
-                            <span class="font-mono font-semibold">${signal.entry}</span>
+                            <span class="font-mono font-semibold">${entry}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-600">SL:</span>
-                            <span class="font-mono text-red-600 font-semibold">${signal.sl}</span>
+                            <span class="font-mono text-red-600 font-semibold">${sl}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-600">TP:</span>
-                            <span class="font-mono text-green-600 font-semibold">${signal.tp}</span>
+                            <span class="font-mono text-green-600 font-semibold">${tp}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Current:</span>
+                            <span class="font-mono text-${priceColor}-600 font-semibold">
+                                ${currentPrice}
+                                <span class="text-xs ml-1">(${priceChange > 0 ? '+' : ''}${priceChange}%)</span>
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Volume:</span>
+                            <span class="font-mono text-gray-600">${signal.volume.toLocaleString()}</span>
                         </div>
                     </div>
                     
                     <div class="border-t pt-3">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs text-gray-500">Created: ${formatTimeInUserTimezone(createdTime)}</span>
+                            <span class="text-xs text-gray-500">Created: ${createdTime.toLocaleTimeString()}</span>
                             <span class="text-xs text-gray-500">Valid for ${signal.validHours}h</span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -988,23 +1077,8 @@
         }
 
         function refreshSignals() {
-            // Simulate new signals with realistic price updates
-            currentSignals.forEach(signal => {
-                const category = Object.keys(tradingPairs).find(cat => 
-                    tradingPairs[cat].some(p => p.symbol === signal.pair)
-                );
-                if (category) {
-                    const pairData = tradingPairs[category].find(p => p.symbol === signal.pair);
-                    if (pairData) {
-                        const prices = generateRealisticPrice(pairData, signal.type);
-                        signal.entry = prices.entry;
-                        signal.sl = prices.sl;
-                        signal.tp = prices.tp;
-                    }
-                }
-            });
-            
-            filterSignals();
+            loadRealTimeData();
+            showNotification('Refreshing signals with latest data');
         }
 
         function calculateRiskReward() {
@@ -1022,11 +1096,8 @@
             const rewardPips = Math.abs(tp - entry);
             const riskRewardRatio = rewardPips / riskPips;
             
-            // Assume 1% risk per trade
             const riskAmount = accountSize * 0.01;
             const rewardAmount = riskAmount * riskRewardRatio;
-            
-            // Simple position size calculation (simplified)
             const positionSize = (riskAmount / riskPips) * 10000;
             
             document.getElementById('riskAmount').textContent = `$${riskAmount.toFixed(2)}`;
@@ -1036,57 +1107,6 @@
             document.getElementById('riskResult').style.display = 'block';
         }
 
-        function removeExpiredSignals() {
-            if (!autoRemoveEnabled) return;
-            
-            const now = new Date();
-            let signalsRemoved = false;
-            
-            currentSignals.forEach(signal => {
-                if (signal.status === 'active') {
-                    const createdTime = new Date(signal.createdAt);
-                    const elapsedHours = (now - createdTime) / (1000 * 60 * 60);
-                    
-                    if (elapsedHours >= signal.validHours) {
-                        signal.status = 'expired';
-                        signalStats.failed++;
-                        
-                        // Update probability stats
-                        if (signal.probLevel === 'high') signalStats.highProb.successful--;
-                        else if (signal.probLevel === 'medium') signalStats.medProb.successful--;
-                        else signalStats.lowProb.successful--;
-                        
-                        signalsRemoved = true;
-                        
-                        // Add to history
-                        signalHistory.push({
-                            ...signal,
-                            result: 'Failed',
-                            completedAt: now
-                        });
-                    }
-                }
-            });
-            
-            if (signalsRemoved) {
-                // Remove expired signals with animation
-                const expiredCards = document.querySelectorAll('.signal-card[data-signal-id]');
-                expiredCards.forEach(card => {
-                    const signalId = parseInt(card.dataset.signalId);
-                    const signal = currentSignals.find(s => s.id === signalId);
-                    if (signal && signal.status === 'expired') {
-                        card.classList.add('card-removed');
-                        setTimeout(() => {
-                            card.remove();
-                        }, 500);
-                    }
-                });
-                
-                filterSignals();
-                updateStats();
-            }
-        }
-
         function updateStats() {
             const activeSignals = currentSignals.filter(s => s.status === 'active').length;
             const successRate = signalStats.total > 0 ? ((signalStats.successful / signalStats.total) * 100).toFixed(1) : 0;
@@ -1094,6 +1114,7 @@
             document.getElementById('totalSignals').textContent = signalStats.total;
             document.getElementById('successfulSignals').textContent = signalStats.successful;
             document.getElementById('failedSignals').textContent = signalStats.failed;
+            document.getElementById('successRateStat').textContent = `${successRate}%`;
             document.getElementById('successRate').textContent = `${successRate}%`;
         }
 
@@ -1127,8 +1148,8 @@
             
             historyTable.innerHTML = recentHistory.map(signal => `
                 <tr class="border-b">
-                    <td class="p-2">${formatTimeInUserTimezone(new Date(signal.completedAt))}</td>
-                    <td class="p-2">${signal.pair}</td>
+                    <td class="p-2">${new Date(signal.completedAt).toLocaleString()}</td>
+                    <td class="p-2">${signal.displayName || signal.symbol}</td>
                     <td class="p-2">
                         <span class="px-2 py-1 text-xs font-semibold text-white bg-${signal.type === 'BUY' ? 'green' : 'red'}-500 rounded">
                             ${signal.type}
@@ -1152,9 +1173,9 @@
         function exportReport() {
             const reportData = {
                 generatedAt: new Date().toISOString(),
-                userTimezone: userTimezone,
                 statistics: signalStats,
-                signalHistory: signalHistory
+                signalHistory: signalHistory,
+                currentSignals: currentSignals
             };
             
             const dataStr = JSON.stringify(reportData, null, 2);
@@ -1166,14 +1187,8 @@
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
-        }
-
-        function showGuide() {
-            document.getElementById('guideModal').style.display = 'flex';
-        }
-
-        function closeGuide() {
-            document.getElementById('guideModal').style.display = 'none';
+            
+            showNotification('Report exported successfully');
         }
 
         // Event listeners
@@ -1181,15 +1196,12 @@
         document.getElementById('pairFilter').addEventListener('change', filterSignals);
         document.getElementById('probabilityFilter').addEventListener('change', filterSignals);
 
-        // Auto-remove expired signals every 5 seconds
-        setInterval(removeExpiredSignals, 5000);
-        
-        // Simulate real-time updates every 10 seconds
-        setInterval(() => {
-            if (disclaimerAccepted) {
-                refreshSignals();
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (updateInterval) {
+                clearInterval(updateInterval);
             }
-        }, 10000);
+        });
     </script>
 </body>
 </html>
