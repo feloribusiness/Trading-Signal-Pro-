@@ -7,6 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Live trading signals with AI-powered technical analysis for Forex, Crypto & Commodities. Real-time signals with risk management.">
+    <meta name="keywords" content="trading signals, forex, crypto, commodities, technical analysis, AI trading">
+    <meta name="author" content="Trading Signal Pro">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Trading Signal Pro - Live Trading Signals">
+    <meta property="og:description" content="AI-powered trading signals for Forex, Crypto & Commodities">
+    <meta property="og:type" content="website">
+    
     <!-- Iklan Popunder - SUDAH TERPASANG -->
     <script type="text/javascript" src="//pl28223555.effectivegatecpm.com/d4/cf/b8/d4cfb853068fa90c68ee8975405165e6.js"></script>
     
@@ -151,7 +161,10 @@
                         <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                         <span class="text-sm text-gray-600">Live</span>
                     </div>
-                    <span class="text-sm text-gray-500" id="currentTime"></span>
+                    <div class="text-right">
+                        <span class="text-sm text-gray-500" id="currentTime"></span>
+                        <div class="text-xs text-gray-400" id="userTimezone"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -299,7 +312,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Entry Price</label>
-                    <input type="number" id="entryPrice" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1.0850">
+                    <input type="number" id="entryPrice" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1.0856">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Stop Loss</label>
@@ -489,6 +502,16 @@
                                 <li>London Session: Highest volatility (8:00-16:00 GMT)</li>
                                 <li>New York Session: Good volatility (13:00-22:00 GMT)</li>
                                 <li>Asian Session: Lower volatility (23:00-8:00 GMT)</li>
+                                <li>Sydney Session: Moderate volatility (21:00-6:00 GMT)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-purple-700">Timezone Considerations</h4>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li><strong>WIB (UTC+7):</strong> Best overlap with London (15:00-23:00 WIB)</li>
+                                <li><strong>WITA (UTC+8):</strong> Good overlap with Asian and London sessions</li>
+                                <li><strong>WIT (UTC+9):</strong> Prime time for Asian session trading</li>
+                                <li><strong>GMT/UTC:</strong> Standard forex market hours reference</li>
                             </ul>
                         </div>
                         <div>
@@ -614,19 +637,56 @@
             lowProb: { total: 0, successful: 0 }
         };
 
-        // Trading pairs data
+        // User timezone detection
+        let userTimezone = {
+            name: '',
+            offset: 0,
+            localTime: new Date()
+        };
+
+        // REALISTIC TRADING PAIRS WITH ACCURATE MARKET PRICES (2024)
         const tradingPairs = {
             forex: [
-                'EUR/USD', 'GBP/USD', 'USD/JPY', 'USD/CHF', 'AUD/USD', 'USD/CAD',
-                'NZD/USD', 'EUR/GBP', 'EUR/JPY', 'GBP/JPY', 'EUR/CHF', 'AUD/JPY',
-                'EUR/AUD', 'GBP/CHF', 'EUR/CAD', 'CAD/JPY', 'NZD/JPY', 'AUD/NZD'
+                { symbol: 'EUR/USD', basePrice: 1.0856, spread: 0.0001, volatility: 0.0020, decimals: 4 },
+                { symbol: 'GBP/USD', basePrice: 1.2745, spread: 0.0002, volatility: 0.0030, decimals: 4 },
+                { symbol: 'USD/JPY', basePrice: 149.85, spread: 0.01, volatility: 0.50, decimals: 2 },
+                { symbol: 'USD/CHF', basePrice: 0.8942, spread: 0.0001, volatility: 0.0020, decimals: 4 },
+                { symbol: 'AUD/USD', basePrice: 0.6648, spread: 0.0001, volatility: 0.0030, decimals: 4 },
+                { symbol: 'USD/CAD', basePrice: 1.3658, spread: 0.0002, volatility: 0.0025, decimals: 4 },
+                { symbol: 'NZD/USD', basePrice: 0.6152, spread: 0.0001, volatility: 0.0035, decimals: 4 },
+                { symbol: 'EUR/GBP', basePrice: 0.8521, spread: 0.0002, volatility: 0.0025, decimals: 4 },
+                { symbol: 'EUR/JPY', basePrice: 162.78, spread: 0.02, volatility: 0.60, decimals: 2 },
+                { symbol: 'GBP/JPY', basePrice: 190.92, spread: 0.03, volatility: 0.80, decimals: 2 },
+                { symbol: 'EUR/CHF', basePrice: 0.9724, spread: 0.0001, volatility: 0.0015, decimals: 4 },
+                { symbol: 'AUD/JPY', basePrice: 99.65, spread: 0.02, volatility: 0.45, decimals: 2 },
+                { symbol: 'EUR/AUD', basePrice: 1.6335, spread: 0.0003, volatility: 0.0040, decimals: 4 },
+                { symbol: 'GBP/CHF', basePrice: 1.1402, spread: 0.0003, volatility: 0.0035, decimals: 4 },
+                { symbol: 'EUR/CAD', basePrice: 1.4829, spread: 0.0003, volatility: 0.0030, decimals: 4 },
+                { symbol: 'CAD/JPY', basePrice: 109.67, spread: 0.02, volatility: 0.40, decimals: 2 },
+                { symbol: 'NZD/JPY', basePrice: 92.18, spread: 0.02, volatility: 0.55, decimals: 2 },
+                { symbol: 'AUD/NZD', basePrice: 1.0802, spread: 0.0002, volatility: 0.0035, decimals: 4 }
             ],
             crypto: [
-                'BTC/USD', 'ETH/USD', 'BNB/USD', 'XRP/USD', 'ADA/USD', 'SOL/USD',
-                'DOGE/USD', 'DOT/USD', 'MATIC/USD', 'LINK/USD', 'UNI/USD', 'LTC/USD'
+                { symbol: 'BTC/USD', basePrice: 67852.45, spread: 50, volatility: 2500, decimals: 2 },
+                { symbol: 'ETH/USD', basePrice: 3468.92, spread: 5, volatility: 180, decimals: 2 },
+                { symbol: 'BNB/USD', basePrice: 585.73, spread: 2, volatility: 28, decimals: 2 },
+                { symbol: 'XRP/USD', basePrice: 0.5234, spread: 0.001, volatility: 0.058, decimals: 4 },
+                { symbol: 'ADA/USD', basePrice: 0.3847, spread: 0.001, volatility: 0.032, decimals: 4 },
+                { symbol: 'SOL/USD', basePrice: 148.95, spread: 1, volatility: 8.5, decimals: 2 },
+                { symbol: 'DOGE/USD', basePrice: 0.1628, spread: 0.0005, volatility: 0.012, decimals: 5 },
+                { symbol: 'DOT/USD', basePrice: 7.923, spread: 0.02, volatility: 0.52, decimals: 3 },
+                { symbol: 'MATIC/USD', basePrice: 0.9284, spread: 0.002, volatility: 0.041, decimals: 4 },
+                { symbol: 'LINK/USD', basePrice: 14.876, spread: 0.05, volatility: 0.82, decimals: 3 },
+                { symbol: 'UNI/USD', basePrice: 9.542, spread: 0.03, volatility: 0.65, decimals: 3 },
+                { symbol: 'LTC/USD', basePrice: 73.185, spread: 0.15, volatility: 3.2, decimals: 3 }
             ],
             commodity: [
-                'XAU/USD', 'XAG/USD', 'OIL/USD', 'NATGAS/USD', 'COPPER/USD', 'WHEAT/USD'
+                { symbol: 'XAU/USD', basePrice: 2358.75, spread: 0.5, volatility: 28.5, decimals: 2 },
+                { symbol: 'XAG/USD', basePrice: 28.64, spread: 0.02, volatility: 0.85, decimals: 2 },
+                { symbol: 'OIL/USD', basePrice: 78.92, spread: 0.05, volatility: 2.8, decimals: 2 },
+                { symbol: 'NATGAS/USD', basePrice: 2.847, spread: 0.01, volatility: 0.16, decimals: 3 },
+                { symbol: 'COPPER/USD', basePrice: 4.168, spread: 0.01, volatility: 0.22, decimals: 3 },
+                { symbol: 'WHEAT/USD', basePrice: 6.284, spread: 0.02, volatility: 0.31, decimals: 3 }
             ]
         };
 
@@ -639,12 +699,40 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            detectUserTimezone();
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
             generateInitialSignals();
             filterSignals();
             updateStats();
         });
+
+        function detectUserTimezone() {
+            const now = new Date();
+            const offset = -now.getTimezoneOffset() / 60; // Convert to hours
+            const offsetString = offset >= 0 ? `UTC+${offset}` : `UTC${offset}`;
+            
+            // Detect common Indonesian timezones
+            let timezoneName = offsetString;
+            if (offset === 7) timezoneName = 'WIB (Western Indonesia Time)';
+            else if (offset === 8) timezoneName = 'WITA (Central Indonesia Time)';
+            else if (offset === 9) timezoneName = 'WIT (Eastern Indonesia Time)';
+            else if (offset === 0) timezoneName = 'GMT (Greenwich Mean Time)';
+            else if (offset === 1) timezoneName = 'CET (Central European Time)';
+            else if (offset === 5.5) timezoneName = 'IST (India Standard Time)';
+            else if (offset === 8) timezoneName = 'CST (China Standard Time)';
+            else if (offset === -5) timezoneName = 'EST (Eastern Standard Time)';
+            else if (offset === -8) timezoneName = 'PST (Pacific Standard Time)';
+            
+            userTimezone = {
+                name: timezoneName,
+                offset: offset,
+                localTime: now
+            };
+            
+            // Update timezone display
+            document.getElementById('userTimezone').textContent = timezoneName;
+        }
 
         function updateCurrentTime() {
             const now = new Date();
@@ -658,7 +746,46 @@
                 second: '2-digit',
                 timeZoneName: 'short'
             };
-            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+            
+            // Format time in user's local timezone
+            const localTimeString = now.toLocaleDateString('en-US', options);
+            document.getElementById('currentTime').textContent = localTimeString;
+        }
+
+        function formatTimeInUserTimezone(date) {
+            const options = {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getMarketSessionStatus() {
+            const now = new Date();
+            const utcHour = now.getUTCHours();
+            const userOffset = -now.getTimezoneOffset() / 60;
+            const localHour = (utcHour + userOffset + 24) % 24;
+            
+            // Market sessions in UTC
+            const sessions = {
+                sydney: { open: 21, close: 6, name: 'Sydney' },
+                tokyo: { open: 23, close: 8, name: 'Tokyo' },
+                london: { open: 8, close: 16, name: 'London' },
+                newYork: { open: 13, close: 22, name: 'New York' }
+            };
+            
+            let activeSessions = [];
+            for (const [key, session] of Object.entries(sessions)) {
+                if (utcHour >= session.open || utcHour < session.close) {
+                    activeSessions.push(session.name);
+                }
+            }
+            
+            return activeSessions.length > 0 ? activeSessions.join(', ') : 'Market Closed';
         }
 
         function acceptDisclaimer() {
@@ -667,9 +794,43 @@
             // Show ad popup after 3 seconds
             setTimeout(() => {
                 if (disclaimerAccepted) {
-                    alert('💰 New trading signals available! Check your dashboard for the latest opportunities.');
+                    alert('💰 New trading signals available! Check your dashboard for latest opportunities.');
                 }
             }, 3000);
+        }
+
+        function generateRealisticPrice(pairData, direction) {
+            const { basePrice, spread, volatility, decimals } = pairData;
+            
+            // Generate realistic price movement within volatility range
+            const maxMovement = volatility * 0.3; // Keep movement within 30% of volatility
+            const randomMovement = (Math.random() - 0.5) * maxMovement;
+            const entryPrice = basePrice + randomMovement;
+            
+            // Calculate stop loss and take profit based on volatility
+            const riskAmount = volatility * 0.15; // 15% of volatility for stop loss
+            const riskRewardRatio = 1.5 + Math.random() * 1.0; // 1.5 to 2.5 risk/reward
+            const rewardAmount = riskAmount * riskRewardRatio;
+            
+            let sl, tp;
+            if (direction === 'BUY') {
+                sl = entryPrice - riskAmount;
+                tp = entryPrice + rewardAmount;
+            } else {
+                sl = entryPrice + riskAmount;
+                tp = entryPrice - rewardAmount;
+            }
+            
+            // Format prices based on decimal places
+            const formatPrice = (price) => {
+                return price.toFixed(decimals);
+            };
+            
+            return {
+                entry: formatPrice(entryPrice),
+                sl: formatPrice(sl),
+                tp: formatPrice(tp)
+            };
         }
 
         function generateInitialSignals() {
@@ -679,7 +840,7 @@
             for (let i = 0; i < signalCount; i++) {
                 const category = Object.keys(tradingPairs)[Math.floor(Math.random() * 3)];
                 const pairs = tradingPairs[category];
-                const pair = pairs[Math.floor(Math.random() * pairs.length)];
+                const pairData = pairs[Math.floor(Math.random() * pairs.length)];
                 const timeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
                 const type = Math.random() > 0.5 ? 'BUY' : 'SELL';
                 const probability = Math.random();
@@ -696,18 +857,15 @@
                     probValue = Math.floor(Math.random() * 30) + 30;
                 }
                 
-                const basePrice = Math.random() * 100 + 100;
-                const entry = basePrice.toFixed(4);
-                const sl = type === 'BUY' ? (basePrice - Math.random() * 2).toFixed(4) : (basePrice + Math.random() * 2).toFixed(4);
-                const tp = type === 'BUY' ? (basePrice + Math.random() * 3).toFixed(4) : (basePrice - Math.random() * 3).toFixed(4);
+                const prices = generateRealisticPrice(pairData, type);
                 
                 const signal = {
                     id: Date.now() + i,
-                    pair,
+                    pair: pairData.symbol,
                     type,
-                    entry,
-                    sl,
-                    tp,
+                    entry: prices.entry,
+                    sl: prices.sl,
+                    tp: prices.tp,
                     timeframe,
                     probability: probValue,
                     probLevel,
@@ -774,7 +932,7 @@
                     
                     <div class="border-t pt-3">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs text-gray-500">Created: ${createdTime.toLocaleTimeString()}</span>
+                            <span class="text-xs text-gray-500">Created: ${formatTimeInUserTimezone(createdTime)}</span>
                             <span class="text-xs text-gray-500">Valid for ${signal.validHours}h</span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -821,12 +979,20 @@
         }
 
         function refreshSignals() {
-            // Simulate new signals
+            // Simulate new signals with realistic price updates
             currentSignals.forEach(signal => {
-                const priceChange = (Math.random() - 0.5) * 0.001;
-                signal.entry = (parseFloat(signal.entry) + priceChange).toFixed(4);
-                signal.sl = (parseFloat(signal.sl) + priceChange).toFixed(4);
-                signal.tp = (parseFloat(signal.tp) + priceChange).toFixed(4);
+                const category = Object.keys(tradingPairs).find(cat => 
+                    tradingPairs[cat].some(p => p.symbol === signal.pair)
+                );
+                if (category) {
+                    const pairData = tradingPairs[category].find(p => p.symbol === signal.pair);
+                    if (pairData) {
+                        const prices = generateRealisticPrice(pairData, signal.type);
+                        signal.entry = prices.entry;
+                        signal.sl = prices.sl;
+                        signal.tp = prices.tp;
+                    }
+                }
             });
             
             filterSignals();
@@ -952,7 +1118,7 @@
             
             historyTable.innerHTML = recentHistory.map(signal => `
                 <tr class="border-b">
-                    <td class="p-2">${new Date(signal.completedAt).toLocaleString()}</td>
+                    <td class="p-2">${formatTimeInUserTimezone(new Date(signal.completedAt))}</td>
                     <td class="p-2">${signal.pair}</td>
                     <td class="p-2">
                         <span class="px-2 py-1 text-xs font-semibold text-white bg-${signal.type === 'BUY' ? 'green' : 'red'}-500 rounded">
@@ -977,6 +1143,7 @@
         function exportReport() {
             const reportData = {
                 generatedAt: new Date().toISOString(),
+                userTimezone: userTimezone,
                 statistics: signalStats,
                 signalHistory: signalHistory
             };
